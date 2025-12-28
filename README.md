@@ -1,10 +1,10 @@
 # Live2D 看板娘
 
-一个基于 Live2D 技术的交互式网页看板娘项目，支持多种模型切换、拖拽移动、自定义消息等功能。
+一个基于 Live2D 技术的交互式网页看板娘项目，支持多种模型切换、拖拽移动、换装功能、自定义消息等功能。
 
 ## 项目介绍
 
-本项目基于 [galnetwen/Live2D](https://github.com/galnetwen/Live2D) 修改而来，添加了模型切换按钮和可拖拽看板娘功能，并调整了模型的初始位置和画布大小，使得模型能够完整显示。
+本项目基于 [galnetwen/Live2D](https://github.com/galnetwen/Live2D) 修改而来，添加了模型切换按钮、换装功能和可拖拽看板娘功能，并调整了模型的初始位置和画布大小，使得模型能够完整显示。项目支持状态缓存，刷新页面后会记住上次选择的模型和服装。
 
 ## 快速开始
 
@@ -38,9 +38,14 @@ http://localhost:8000/demo.html
 ### 🎨 多模型支持
 - 内置多种 Live2D 模型可供选择
 - 支持一键切换不同模型
-- 包含多种角色和风格（如：HK416、黑白猫、血小板、Rem等）
+- 包含多种角色和风格（如：Miku、初音未来、Rem、B站22和33娘等）
 
-### 🖱️ 拖拽功能
+### � 换装功能
+- 部分模型支持多种服装切换
+- B站22娘和33娘支持20+种不同风格的服装
+- 包括节日服装、校服、夏装等多种风格
+
+### �️ 拖拽功能
 - 支持鼠标拖拽移动看板娘位置
 - 拖动时自动暂停动画，提升性能
 - 可拖动至页面任意位置
@@ -49,6 +54,7 @@ http://localhost:8000/demo.html
 - 支持鼠标悬停和点击交互
 - 可自定义各种场景下的对话内容
 - 集成一言API，自动显示随机名言
+- 根据时间段显示不同的问候语
 
 ### ⚙️ 灵活配置
 - 可调整画布尺寸和初始位置
@@ -59,6 +65,12 @@ http://localhost:8000/demo.html
 - 模型自带多种动画效果
 - 支持触摸和点击触发特殊动作
 - 平滑的过渡效果
+
+### 💾 状态缓存
+- 自动记住当前选择的模型
+- 记住每个角色的当前服装状态
+- 刷新页面后状态保持不变
+- 支持快捷键清除缓存（Shift+Ctrl+Alt+Enter）
 
 ## 目录结构
 
@@ -73,21 +85,27 @@ Live2D/
 │   │   ├── message.js           # 消息处理脚本
 │   │   └── start.js             # 初始化脚本
 │   ├── model/                   # 模型目录
-│   │   ├── HK416-1-normal/      
-│   │   ├── HK416-2-destroy/     
-│   │   ├── cat-black/           
-│   │   ├── cat-white/           
-│   │   ├── date/                
-│   │   ├── hallo/              
-│   │   ├── kobayaxi/            
-│   │   ├── kp31/               
-│   │   ├── platelet/          
-│   │   ├── rem_2/              
-│   │   ├── terisa/              
-│   │   └── wed_16/             
+│   │   ├── 22/                  # B站22娘模型（含20+种服装）
+│   │   ├── 33/                  # B站33娘模型（含20+种服装）
+│   │   ├── miku/                # 初音未来模型
+│   │   ├── snow_miku/           # 雪初音模型
+│   │   ├── rem/                 # 拉姆模型
+│   │   ├── HK416-1-normal/      # HK416普通版
+│   │   ├── HK416-2-destroy/     # HK416破坏版
+│   │   ├── cat-black/           # 黑猫模型
+│   │   ├── cat-white/           # 白猫模型
+│   │   ├── date/                # 德丽莎模型
+│   │   ├── hallo/               # 哈喽模型
+│   │   ├── kobayaxi/            # 小林模型
+│   │   ├── kp31/                # KP31模型
+│   │   ├── platelet/            # 血小板模型
+│   │   ├── rem_2/               # 拉姆第二版
+│   │   ├── terisa/              # 特丽莎模型
+│   │   └── wed_16/              # 婚纱模型
 │   └── message.json             # 交互消息配置
 ├── demo.html                    # 示例页面
-└── README.md                    # 项目文档
+├── README.md                    # 项目文档
+└── 138006428_p1.png             # 示例图标
 ```
 
 ## 配置说明
@@ -99,14 +117,35 @@ Live2D/
 ```javascript
 // 模型列表，包含所有可用模型
 var models = [
-    "/live2d/model/hallo/model.json",
-    "/live2d/model/date/model.json",
-    "/live2d/model/cat-black/model.json",
-    // 添加更多模型...
+    "/live2d/model/miku/miku.model.json",
+    "/live2d/model/snow_miku/model.json",
+    "/live2d/model/rem/model.json",
+    "/live2d/model/22/model.default.json",
+    "/live2d/model/33/model.default.json"
 ];
 ```
 
-### 2. 消息配置
+### 2. 换装配置
+
+在 `live2d/js/start.js` 文件中可以配置角色换装：
+
+```javascript
+// 角色换装配置
+var characterOutfits = {
+    "22": [
+        "/live2d/model/22/model.default.json",
+        "/live2d/model/22/model.2016.xmas.1.json",
+        // 更多服装...
+    ],
+    "33": [
+        "/live2d/model/33/model.default.json",
+        "/live2d/model/33/model.2016.xmas.1.json",
+        // 更多服装...
+    ]
+};
+```
+
+### 3. 消息配置
 
 编辑 `live2d/message.json` 文件，自定义交互消息：
 
@@ -127,7 +166,7 @@ var models = [
 }
 ```
 
-### 3. 画布尺寸
+### 4. 画布尺寸
 
 在 HTML 文件中修改 canvas 标签的 width 和 height 属性：
 
@@ -135,7 +174,7 @@ var models = [
 <canvas id="live2d" width="340" height="850" class="live2d"></canvas>
 ```
 
-### 4. 初始位置
+### 5. 初始位置
 
 编辑 `live2d/css/live2d.css` 文件，调整看板娘初始位置：
 
@@ -147,12 +186,49 @@ var models = [
 }
 ```
 
-### 5. 消息显示间隔
+### 6. 消息显示间隔
 
 编辑 `live2d/js/message.js` 文件，修改一言API调用间隔：
 
 ```javascript
 // 15秒输出一次
+window.setInterval(showHitokoto, 15000);
+```
+
+## 高级功能
+
+### 状态缓存
+项目支持状态缓存功能，会自动记住：
+- 当前选择的模型
+- 每个角色的当前服装状态
+
+刷新页面后状态保持不变，无需重新设置。
+
+### 清除缓存
+如需清除缓存状态，可以：
+1. 使用快捷键：`Shift+Ctrl+Alt+Enter`
+2. 在浏览器控制台中执行：
+   ```javascript
+   localStorage.removeItem('live2d_current_model_index');
+   localStorage.removeItem('live2d_outfit_indices');
+   location.reload();
+   ```
+
+### 时间段问候
+看板娘会根据当前时间显示不同的问候语：
+- 23:00-05:00：夜猫子提醒
+- 05:00-07:00：早上好
+- 07:00-11:00：上午好
+- 11:00-14:00：午餐时间
+- 14:00-17:00：午后提醒
+- 17:00-19:00：傍晚问候
+- 19:00-21:00：晚上好
+- 21:00-23:00：晚安提醒
+
+### 一言API
+项目集成了一言API，每15秒自动显示一条随机名言。可以在 `live2d/js/message.js` 中修改间隔时间：
+```javascript
+// 修改为一言显示间隔（毫秒）
 window.setInterval(showHitokoto, 15000);
 ```
 
@@ -176,9 +252,10 @@ window.setInterval(showHitokoto, 15000);
 <!-- 添加看板娘容器 -->
 <div id="landlord">
     <div class="message"></div>
-    <canvas id="live2d" width="340" height="850" class="live2d"></canvas>
+    <canvas id="live2d" width="340" height="750" class="live2d"></canvas>
     <div class="hide-button">隐藏</div>
     <div class="switch-button">切换</div>
+    <div class="outfit-button">换装</div>
 </div>
 
 <!-- 引入核心功能脚本 -->
@@ -221,13 +298,39 @@ var models = [
 - Edge
 - Internet Explorer 11+
 
+## 常见问题
+
+### 1. 模型无法加载
+- 确保使用 HTTP/HTTPS 协议访问，`file://` 协议可能无法正常加载模型
+- 检查模型路径是否正确
+- 查看浏览器控制台是否有错误信息
+
+### 2. 按钮不显示
+- 确保已正确引入 jQuery 和 jQuery UI
+- 检查 CSS 文件是否正确加载
+- 尝试清除浏览器缓存
+
+### 3. 换装功能无效
+- 确保当前模型支持换装（目前仅B站22娘和33娘支持）
+- 检查 `start.js` 中的 `characterOutfits` 配置是否正确
+- 确认模型文件路径是否正确
+
+### 4. 移动端不显示
+- 默认在屏幕宽度小于860px时隐藏看板娘
+- 可在 `live2d/css/live2d.css` 中修改媒体查询条件
+
+### 5. 消息不显示
+- 检查 `message.json` 文件是否正确加载
+- 确认选择器是否与页面元素匹配
+- 检查控制台是否有错误信息
+
 ## 注意事项
 
 1. 确保你的网站使用 HTTP/HTTPS 协议访问，本地文件 `file://` 协议可能无法正常加载模型
 2. 部分模型可能较大，首次加载需要一定时间
 3. 建议使用现代浏览器以获得最佳体验
 4. 移动端浏览器可能存在兼容性问题
-5. **路径配置注意事项**：在 `live2d/js/message.js` 文件的第38行，有一个message.json的路径设置：
+5. **路径配置注意事项**：在 `live2d/js/message.js` 文件的第30行，有一个message.json的路径设置：
    ```javascript
    url: `/live2d/message.json`,
    ```
@@ -235,7 +338,11 @@ var models = [
 
 ## 模型来源
 
-Live2D 模型来源：[oh-my-live2d/live2d-models](https://github.com/oh-my-live2d/live2d-models)
+Live2D 模型主要来源：
+- [imuncle/live2d](https://github.com/imuncle/live2d) - live2d模型收集+展示，包含128个模型
+- [oh-my-live2d/live2d-models](https://github.com/oh-my-live2d/live2d-models)
+
+**版权须知**：所有模型均收集自互联网，版权均归原公司/个人所有。您可将资源用于学习、非营利性的网站或项目，不得用于商业使用（付费分发售卖资源、二次修改用于盈利等）。
 
 
 ## 原项目

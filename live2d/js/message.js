@@ -20,14 +20,6 @@ String.prototype.renderTip = function (context) {
     return renderTip(this, context);
 };
 
-// var re = /x/;
-// console.log(re);
-// re.toString = function () {
-//     showMessage('哈哈，你打开了控制台，是想要看看我的秘密吗？', 5000);
-//     return '';
-// };
-console.log('哈哈，你打开了控制台，是想要看看我的秘密吗？');
-
 $(document).on('copy', function () {
     showMessage('你都复制了些什么呀，转载要记得加上出处哦~~', 5000);
 });
@@ -39,21 +31,24 @@ function initTips() {
         dataType: "json",
         success: function (result) {
             $.each(result.mouseover, function (index, tips) {
-                $(tips.selector).mouseover(function () {
+                $(document).on('mouseover', tips.selector, function () {
                     var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length)];
                     text = text.renderTip({ text: $(this).text() });
                     showMessage(text, 3000);
                 });
             });
             $.each(result.click, function (index, tips) {
-                $(tips.selector).click(function () {
+                $(document).on('click', tips.selector, function () {
                     var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length)];
                     text = text.renderTip({ text: $(this).text() });
                     showMessage(text, 3000);
                 });
             });
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load message.json:', error);
         }
     });
 }
@@ -84,16 +79,17 @@ initTips();
     showMessage(text, 12000);
 })();
 
+// 每15秒显示一条一言
 window.setInterval(showHitokoto, 15000);
 
 function showHitokoto() {
     $.getJSON('https://v1.hitokoto.cn/', function (result) {
-        showMessage(result.hitokoto, 5000);
+        showMessage(result.hitokoto, 3000);// 显示一言 3秒后隐藏
     });
 }
 
 function showMessage(text, timeout) {
-    if (Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1) - 1];
+    if (Array.isArray(text)) text = text[Math.floor(Math.random() * text.length)];
     //console.log('showMessage', text);
     $('.message').stop();
     $('.message').html(text).fadeTo(200, 1);
@@ -113,13 +109,12 @@ function initLive2d() {
     })
     $('#landlord').hover(() => {
         $('.hide-button').fadeIn(600)
+        $('.switch-button').fadeIn(600)
+        $('.outfit-button').fadeIn(600)
     }, () => {
         $('.hide-button').fadeOut(600)
-    })
-    $('#landlord').hover(() => {
-        $('.switch-button').fadeIn(600)
-    }, () => {
         $('.switch-button').fadeOut(600)
+        $('.outfit-button').fadeOut(600)
     })
 }
 initLive2d();

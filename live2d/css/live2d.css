@@ -2,10 +2,11 @@
     user-select: none; /* 禁止选中 */
     position: fixed;
     left: 0;
-    top: calc(50% - 280px);
+    top: calc(50% - 50px);
     z-index: 10000;
     font-size: 0;
     transition: all .3s ease-in-out;
+    /* background-color: rgba(255,255,255,.2); */
 }
 
 #live2d {
@@ -18,7 +19,7 @@
     height: auto;
     margin: auto;
     padding: 7px;
-    top: 200px   ;
+    top: 60px;
     left: 10px;
     transform: translateY(-50%);
     text-align: center;
@@ -41,7 +42,7 @@
 
 .hide-button {
     position: absolute;
-    top: 290px;
+    top: 200px;
     right: 10px;
     display: none;
     overflow: hidden;
@@ -65,7 +66,7 @@
 .switch-button {
     position: absolute;
     right: 10px;
-    top: 320px;
+    top: 230px;
     display: none;
     overflow: hidden;
     /* padding: 4px; */
@@ -81,6 +82,29 @@
 }
 
 .switch-button:hover {
+    border: 1px solid #f4a7b9;
+    background: #f4f6f8;
+}
+
+.outfit-button {
+    position: absolute;
+    right: 10px;
+    top: 260px;
+    display: none;
+    overflow: hidden;
+    width: 60px;
+    height: 20px;
+    border: 1px solid rgba(255,137,255,.4);
+    border-radius: 12px;
+    background: rgba(255,137,255,.2);
+    box-shadow: 0 3px 15px 2px rgba(255,137,255,.4);
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10001;
+}
+
+.outfit-button:hover {
     border: 1px solid #f4a7b9;
     background: #f4f6f8;
 }
